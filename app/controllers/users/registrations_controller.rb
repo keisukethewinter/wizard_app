@@ -3,8 +3,22 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   # before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
+  
   def new
     @user = User.new #最初にdeviseとUserモデルが紐づくように設定してあるので、"super"でも同様の操作を行ってくれます。
+  end
+
+  def create
+    @user = User.new(sign_up_params)
+    unless @user.valid?
+      render :new and return
+    end
+    session["devise.regist_data"] = {user: @user.attributes}
+    # binding.pry
+    session["devise.regist_data"][:user]["password"] = params[:user][:password]
+    # binding.pry
+    @address = @user.build_address
+    render :new_address
   end
   # GET /resource/sign_up
   # def new
